@@ -16,6 +16,7 @@ class HerokuNodeDeployment(BaseDeployment):
         app_type: str = "websocket",
         dev_user: str = "OpenMined",
         branch: set = "dev",
+        stack: str = "heroku-18",
         env_vars={},
     ):
         """ Initialize Settings to deploy Grid Node Deployment on Heroku
@@ -26,6 +27,7 @@ class HerokuNodeDeployment(BaseDeployment):
             app_type: choose different node app types to deploy (websocket, pg_rest_api, rest_api).
             dev_used: Choose an specific Grid repository (standard: OpenMined repositoy).
             branch: Choose an specific Grid branch (standard: dev branch).
+            stack: The OS stack for Heroku to use.  (standard: heroku-18).
             env_vars: Environment vars used to configure component.
         """
         self.app_type = app_type
@@ -33,6 +35,7 @@ class HerokuNodeDeployment(BaseDeployment):
         self.check_deps = check_deps
         self.dev_user = dev_user
         self.branch = branch
+        self.stack = stack
 
         super().__init__(env_vars, verbose)
 
@@ -127,6 +130,9 @@ class HerokuNodeDeployment(BaseDeployment):
         for var in self.env_vars:
             self.logs.append("Setting environment variable: ")
             self.commands.append("heroku config:set " + var + "=" + self.env_vars[var])
+        
+        self.logs.append(f"Setting stack to {self.stack}")
+        self.commands.append(f"heroku stack:set {self.stack}")
 
         self.logs.append(
             "Step 13: Pushing code to Heroku (this can take take a few minutes"
